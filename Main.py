@@ -1,5 +1,3 @@
-from turtle import width
-from tomlkit import value
 from functs_vars import *
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~tk init
