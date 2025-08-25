@@ -1,4 +1,4 @@
-from global_vars import *
+from functs_vars import *
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Settings JSON Class~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 class JSON:

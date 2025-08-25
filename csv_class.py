@@ -1,4 +1,4 @@
-from global_vars import *
+from functs_vars import *
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~CSV Class~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 class CSV:
@@ -37,10 +37,10 @@ class CSV:
             
     @classmethod
     def remove_entry(cls, mode, date): #need to refactor to use .drop method but it hurts my head
-        if mode == "result":
+        if mode == "results":
             filename = cls.results_filename
             columns = cls.results_columns
-        elif mode == "note":
+        elif mode == "notes":
             filename = cls.notes_filename
             columns = cls.notes_columns
         df = pd.read_csv(path.join(wdir, filename))
@@ -56,21 +56,6 @@ class CSV:
             df = pd.DataFrame(columns = columns)
             df.to_csv(path.join(wdir, filename), index = False)
             filtered_df.to_csv(path.join(wdir, filename), mode = 'a', index=False, header=False, date_format=date_format)
-        
-    @classmethod
-    def get_results(cls, start_date, end_date):
-        df = pd.read_csv(path.join(wdir, cls.results_filename))
-        df["Date"] = pd.to_datetime(df["Date"], format = date_format)
-        start_date = datetime.strptime(start_date, date_format)
-        end_date = datetime.strptime(end_date, date_format)
-        mask = (df["Date"] >= start_date) & (df["Date"] <= end_date)
-        filtered_df = df.loc[mask].sort_values("Date")
-        if filtered_df.empty:
-            print("No results found within the given range.")
-        else:
-            print(f"Results from {start_date.strftime(date_format)} to {end_date.strftime(date_format)}.")
-            print (filtered_df.to_string(index=False, formatters={"Date": lambda x: x.strftime(date_format)}))
-        return filtered_df
     
     @classmethod
     def view_all(cls, mode):

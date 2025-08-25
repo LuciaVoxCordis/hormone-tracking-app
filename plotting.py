@@ -1,4 +1,4 @@
-from global_vars import *
+from functs_vars import *
 import matplotlib.pyplot as plt
 
 from csv_class import CSV

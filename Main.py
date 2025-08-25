@@ -1,181 +1,181 @@
-from global_vars import *
-from csv_class import CSV
-from json_class import JSON
-from functions import add_result, add_note, initialize_data_folder, remove, get_date, change_e_lower, change_e_upper, change_t_lower, change_t_upper
-from plotting import plot_results
+from turtle import width
+from tomlkit import value
+from functs_vars import *
 
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Main Loop~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-#def main():
-#    while True:
-#        print("\n1. Add new test results")
-#        print("2. Remove a test result")
-#        print("3. view all test results")
-#        print("4. View test results within a date range")
-#        print("5. add a new note/event")
-#        print("6. Remove a note/event")
-#        print("7. View notes")
-#        print("8. View and edit target levels")
-#        print("9. Exit")
-#        choice = input("Enter selection (1-9): ")
-#        
-#        if choice == "1":
-#            add_result()
-#        elif choice == "2":
-#            remove("result")
-#        elif choice == "3":
-#            df = CSV.view_all("results")
-#            if input("Do you wish to see a plot? (Y/N)").lower() == "y":
-#                plot_results(df)
-#        elif choice == "4":
-#            start_date = get_date("Please enter the date to display results from (DD-MM-YYYY): ")
-#            end_date = get_date("Please enter the date to display results to (DD-MM-YYYY): ")
-#            df = CSV.get_results(start_date, end_date)
-#            if input("Do you wish to see a plot? (Y/N)").lower() == "y":
-#                plot_results(df)
-#        elif choice == "5":
-#            add_note()
-#        elif choice == "6":
-#            remove("note")
-#        elif choice == "7":
-#            df = CSV.view_all("notes")
-#            input ("Press any key to continue")
-#        elif choice == "8":
-#            settings_df = pd.read_json(path.join(wdir, JSON.file_name), typ = 'series')
-#            print("Current target levels are set to:")
-#            print(f"{settings_df['e_lower']}-{settings_df['e_upper']}pmol/L for Oestrogen\n{settings_df['t_lower']}-{settings_df['t_upper']}nmol/L for Testosterone.")
-#            if input ("Would you like to change this? (Y/N)").lower() == 'y':
-#                JSON.change_settings(change_e_lower(), change_e_upper(), change_t_lower(), change_t_upper())
-#        elif choice == "9":
-#            print ("Exiting...")
-#            break
-#        else:
-#            print("Please enter a valid option (1-9)")
-#            
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Tkinter~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-
-#window
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~tk init
 window = tk.Tk()
 window.geometry('800x600')
 window.title('Hormone Tracking')
 
-#tabs
+from tk_functs_vars import *
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~tabs
 tabs = ttk.Notebook(window)
 
-#Results Tab
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~Results Tab~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 tab_results = ttk.Frame(tabs)
-tab_results.pack()
-label_add_result = ttk.Label(tab_results, text = 'Results')
-label_add_result.pack()
+ttk.Label(tab_results, text = 'Results').pack()
 
-#Results Table
-table = ttk.Treeview(tab_results, columns = ('Date', 'Estrogen Level', 'Testosterone Level'), show = 'headings')
-table.heading('Date', text = 'Date')
-table.heading('Estrogen Level', text = 'Estrogen Level')
-table.heading('Testosterone Level', text = 'Testosterone Level')
-table.pack(fill = 'both', expand = True)
-
-def draw_table():
-    for i in table.get_children():
-        table.delete(i) 
-    df = CSV.view_all("results")
-    for i, v in df.iterrows():
-        date = v['Date'].strftime(date_format)
-        e_levels = v['Oestradiol']
-        t_levels = v['Testosterone']
-        data = (date, e_levels, t_levels)
-        table.insert(parent = '', index = 0, values = data)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~Results Table
+table_results = ttk.Treeview(tab_results, columns = ('Date', 'Estrogen Level', 'Testosterone Level'), show = 'headings')
+table_results.heading('Date', text = 'Date')
+table_results.heading('Estrogen Level', text = 'Estrogen Level')
+table_results.heading('Testosterone Level', text = 'Testosterone Level')
+table_results.pack(fill = 'both', expand = True)
 
 frame_table_buttons = ttk.Frame(tab_results)
+ttk.Button(frame_table_buttons, text = 'Delete selected item(s)', command = lambda: delete_items("results", table_results)).pack(side = 'left', padx = 5)
+ttk.Button(frame_table_buttons, text = 'View results as graph', command = view_graph).pack(side = 'right', padx = 5)
 frame_table_buttons.pack()
 
-def delete_items():
-    for i in table.selection():
-        CSV.remove_entry("result", table.item(i)['values'][0])
-        draw_table()
-        
-button_delete_items = ttk.Button(frame_table_buttons, text = 'Delete selected item(s)', command = delete_items)
-button_delete_items.pack(side = 'left', padx = 5)
-
-def view_graph():
-    df = CSV.view_all("results")
-    plot_results(df)
-
-button_view_graph = ttk.Button(frame_table_buttons, text = 'View results as graph', command = view_graph)
-button_view_graph.pack(side = 'right', padx = 5)
-
-#Add Results Frame
+#~~~~~~~~~~~~~~~~~~~~~~~~~~Add Results Frame
 frame_add_results = ttk.Frame(tab_results)
-frame_add_results.pack()
-
-label_add_result = ttk.Label(frame_add_results, text = 'Add a new Result')
-label_add_result.pack()
+ttk.Label(frame_add_results, text = 'Add a new Result').pack()
 
 frame_labels = ttk.Frame(frame_add_results)
+ttk.Label(frame_labels, text = 'Date: (DD-MM-YYYY)').pack(side = 'left', padx = 5)
+ttk.Label(frame_labels, text = 'Estrogen Level (pmol/L)').pack(side = 'left', padx = 5)
+ttk.Label(frame_labels, text = 'Testosteron Level (nmol/L)').pack(side = 'left', padx = 5)
 frame_labels.pack()
-label_date = ttk.Label(frame_labels, text = 'Date: (DD-MM-YYYY)')
-label_date.pack(side = 'left', padx = 5)
-label_estrogen = ttk.Label(frame_labels, text = 'Estrogen Level (pmol/L)')
-label_estrogen.pack(side = 'left', padx = 5)
-label_testosterone = ttk.Label(frame_labels, text = 'Testosteron Level (nmol/L)')
-label_testosterone.pack(side = 'left', padx = 5)
 
 frame_results_entries = ttk.Frame(frame_add_results)
-frame_results_entries.pack()
-date_var = tk.StringVar(value = 'DD-MM-YYYY')
 entry_date = ttk.Entry(frame_results_entries, textvariable = date_var)
 entry_date.bind('<FocusIn>', lambda event: date_var.set(''))
 entry_date.pack(side = 'left')
-
-estrogen_var = tk.IntVar(value = 0)
 entry_estrogen = ttk.Entry(frame_results_entries, textvariable = estrogen_var)
 entry_estrogen.bind('<FocusIn>', lambda event: estrogen_var.set(''))
 entry_estrogen.pack(side = 'left')
-
-testosterone_var = tk.IntVar(value = 0)
 entry_testosterone = ttk.Entry(frame_results_entries, textvariable = testosterone_var)
 entry_testosterone.bind('<FocusIn>', lambda event: testosterone_var.set(''))
 entry_testosterone.pack(side = 'left')
+frame_results_entries.pack()
 
-def handle_button_add_result():
-    try:
-        date = get_date(str(date_var.get()))
-        estrogen = float(estrogen_var.get())
-        testosterone = float(testosterone_var.get())
-        if date == ValueError:
-            print('date error!')
-        else:
-            data = [date, estrogen, testosterone]
-            CSV.add_entry("results", date, estrogen, testosterone)
-            draw_table()
-    except TclError:
-        print('float error!')
+ttk.Button(frame_add_results, text = 'Add Result', command = lambda: handle_button_add_result(table_results)).pack()
+frame_add_results.pack()
 
-button_add_result = ttk.Button(frame_add_results, text = 'Add Result', command = handle_button_add_result)
-button_add_result.pack()
+tab_results.pack()
 
-#Notes Tab
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Notes Tab~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 tab_notes = ttk.Frame(tabs)
-label_remove_result = ttk.Label(tab_notes, text = 'Notes')
-label_remove_result.pack()
+ttk.Label(tab_notes, text = 'Notes').pack()
 
-#Settings Tab
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~Notes Table
+table_notes = ttk.Treeview(tab_notes, columns = ('Date', 'Note'), show = 'headings')
+table_notes.heading('Date', text = 'Date')
+table_notes.heading('Note', text = 'Note')
+table_notes.pack(fill = 'both', expand = True)
+
+frame_table_buttons_notes = ttk.Frame(tab_notes)       
+ttk.Button(frame_table_buttons_notes, text = 'Delete selected item(s)', command = lambda: delete_items("notes", table_notes)).pack(side = 'left', padx = 5)
+frame_table_buttons_notes.pack()
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~Add Notes Frame
+frame_add_notes = ttk.Frame(tab_notes)
+ttk.Label(frame_add_notes, text = 'Add a new Note').pack()
+
+frame_notes_labels = ttk.Frame(frame_add_notes)
+ttk.Label(frame_notes_labels, text = 'Date: (DD-MM-YYYY)').pack(side = 'left', padx = 5)
+ttk.Label(frame_notes_labels, text = 'Note:').pack(side = 'left', padx = 5)
+frame_notes_labels.pack()
+
+frame_notes_entries = ttk.Frame(frame_add_notes)
+entry_notes_date = ttk.Entry(frame_notes_entries, textvariable = notes_date_var)
+entry_notes_date.bind('<FocusIn>', lambda event: notes_date_var.set(''))
+entry_notes_date.pack(side = 'left')
+entry_notes = ttk.Entry(frame_notes_entries, textvariable = notes_var)
+entry_notes.bind('<FocusIn>', lambda event: notes_var.set(''))
+entry_notes.pack(side = 'left')
+frame_notes_entries.pack()
+
+ttk.Button(frame_add_notes, text = 'Add Note', command = lambda: handle_button_add_note(table_notes)).pack()
+frame_add_notes.pack()
+
+tab_notes.pack()
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~Settings Tab~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 tab_settings = ttk.Frame(tabs)
-label_settings = ttk.Label(tab_settings, text = 'Settings')#
-label_settings.pack()
+tk.Label(tab_settings, text = 'Settings').pack()
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~E-levels Frame
+frame_e_levels = ttk.Frame(tab_settings)
+ttk.Label(frame_e_levels, text = 'Target E levels:').pack(side= 'top')
 
+frame_e_lower = ttk.Frame(frame_e_levels)
+ttk.Label(frame_e_lower, text = 'lower:').pack(side= 'top')
+#ttk.Label(frame_e_lower, text = e_lower, textvariable = e_lower).pack()
+spin_e_lower = ttk.Spinbox(frame_e_lower, 
+                   from_ = 0, 
+                   to = 2000, 
+                   increment = 10, 
+                   textvariable = e_lower,
+                   width = 5)
+spin_e_lower.bind('<<Increment>>')
+spin_e_lower.bind('<<Decrement>>')
+spin_e_lower.pack()
+frame_e_lower.pack(side = 'left', padx = 10)
+
+frame_e_upper = ttk.Frame(frame_e_levels)
+ttk.Label(frame_e_upper, text = 'upper:').pack(side= 'top')
+spin_e_upper = ttk.Spinbox(frame_e_upper, 
+                   from_ = 0, 
+                   to = 2000, 
+                   increment = 10, 
+                   textvariable = e_upper,
+                   width = 5)
+spin_e_upper.bind('<<Increment>>')
+spin_e_upper.bind('<<Decrement>>')
+spin_e_upper.pack()
+frame_e_upper.pack(side = 'right', padx = 10)
+
+frame_e_levels.pack()
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~T-levels Frame
+frame_t_levels = ttk.Frame(tab_settings)
+ttk.Label(frame_t_levels, text = 'Target T levels:').pack(side= 'top')
+
+frame_t_lower = ttk.Frame(frame_t_levels)
+ttk.Label(frame_t_lower, text = 'lower:').pack(side= 'top')
+spin_t_lower = ttk.Spinbox(frame_t_lower, 
+                   from_ = 0, 
+                   to = 100, 
+                   increment = 0.1, 
+                   textvariable = t_lower,
+                   width = 5)
+spin_t_lower.bind('<<Increment>>')
+spin_t_lower.bind('<<Decrement>>')
+spin_t_lower.pack()
+frame_t_lower.pack(side = 'left', padx = 10)
+
+frame_t_upper = ttk.Frame(frame_t_levels)
+ttk.Label(frame_t_upper, text = 'upper:').pack(side= 'top')
+spin_t_upper = ttk.Spinbox(frame_t_upper, 
+                   from_ = 0, 
+                   to = 100, 
+                   increment = 0.1, 
+                   textvariable = t_upper,
+                   width = 5)
+spin_t_upper.bind('<<Increment>>')
+spin_t_upper.bind('<<Decrement>>')
+spin_t_upper.pack()
+frame_t_upper.pack(side = 'right', padx = 10)
+
+frame_t_levels.pack()
+
+ttk.Button(tab_settings, text = 'Save levels', command = handle_button_update_levels).pack()
+
+tab_settings.pack()
+#~~~~~~~~~~~~~~~~~~~~~~~~Adding/packing Tabs~~~~~~~~~~~~~~~~~~~~~~~~#
 tabs.add(tab_results, text = 'Results')
 tabs.add(tab_notes, text = 'Notes')
 tabs.add(tab_settings, text = 'Settings')
 tabs.pack()
-
-            
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Run~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Run~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 if __name__ == "__main__":
     initialize_data_folder()
     CSV.initialize_files()
     JSON.initialize_json()
-    draw_table()
+    draw_table("results", table_results)
+    draw_table("notes", table_notes)
+    update_settings()
     window.mainloop()
-    
