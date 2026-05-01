@@ -6,7 +6,7 @@ from plotting import plot_results
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~Tk Variables~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 date_var = tk.StringVar(value = 'DD-MM-YYYY')
 estrogen_var = tk.IntVar(value = 0)
-testosterone_var = tk.IntVar(value = 0)
+testosterone_var = tk.DoubleVar(value = 0)
 
 notes_date_var = tk.StringVar(value = 'DD-MM-YYYY')
 notes_var = tk.StringVar(value = 'Note')
